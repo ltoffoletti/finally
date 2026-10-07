@@ -511,6 +511,11 @@ The container is designed to deploy to AWS App Runner, Render, or any container 
 20. **[C] Static file serving.** Mount `StaticFiles(directory="static", html=True)` at `/` *after* the API routers. Confirm the app has no client-side routes, so no SPA catch-all fallback is needed.
 21. **[Q] Massive mode cadence.** With 15s polling, prices flash only every 15s and sparklines are sparse. Massive also returns stale prices outside market hours. Is that acceptable? A one-line note in the README would set expectations.
 22. **[Q] Reset.** Is there a way to reset the portfolio to $10k (useful for demos and E2E test isolation)? *Suggested:* no reset endpoint in the core build; the E2E compose file uses a fresh volume per run.
+23. **[C] The Massive poll interval isn't actually configurable.** §6 says Massive polls "on a configurable interval" (2–15s by tier), but `create_market_data_source()` never passes `poll_interval`, so it is always the 15s default. *Suggested:* add an optional `MASSIVE_POLL_INTERVAL` env var (seconds, default 15) to §5 and read it in the factory.
+24. **[Q] Chat history on page load.** `chat_messages` is persisted, but §8 has no endpoint to read it, so a page refresh shows an empty chat even though the LLM still "remembers" the conversation. *Suggested:* add `GET /api/chat` returning recent messages with their `actions`. Otherwise, state explicitly that the chat panel starts empty on every load.
+25. **[C] "% change" in the positions table.** It's ambiguous next to the watchlist's daily change. *Suggested:* define it as unrealized P&L % relative to cost: `(current_price - avg_cost) / avg_cost × 100`.
+26. **[C] Timestamp format.** SSE `timestamp` is Unix seconds (float), while every DB and REST timestamp is ISO 8601. Pick one convention for REST responses (*suggested:* ISO 8601 UTC with a `Z` suffix) and note that SSE uses Unix seconds, so the frontend converts consistently.
+27. **[C] Trade atomicity.** A trade updates `users_profile.cash_balance`, upserts `positions`, appends to `trades` and writes a snapshot. Do the validation and all of these writes in **one SQLite transaction**, so a failure partway (or a chat trade racing a manual one) can't leave cash and positions out of sync.
 
 ### 13.3 Opportunities to simplify
 
