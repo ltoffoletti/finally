@@ -1,0 +1,10 @@
+{
+  "name": "independent-review",
+  "description": "Independent review of planning documents: adds questions, clarifications, feedback and simplification opportunities to a review section at the end of the doc.",
+  "version": "0.1.0",
+  "author": {
+    "name": "ltoffoletti",
+    "email": "luis.toffoletti@gmail.com"
+  },
+  "keywords": ["review", "documentation", "planning"]
+}
